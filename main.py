@@ -41,11 +41,13 @@ def search_user(user):
     time.sleep(1)
 
 
-def add_all_users():
+def add_all_users(last_num):
     with open("user_list.txt", "r", encoding='UTF-8') as f:
         text = f.read()
-        for user in text.split('\n'):
-            print(user)
+        if last_num:
+            text=text.split(last_num)[1]
+        for i, user in enumerate(text.split('\n')):
+            print(user, i%20)
             pyautogui.hotkey('command', '2')
             pyautogui.hotkey('command', '1')
             # click_image(f'{MEDIA_PATH}add_user.png')
@@ -56,17 +58,18 @@ def add_all_users():
             pyautogui.hotkey('command', 'v')
             # click_image(f'{MEDIA_PATH}add_user_submit_button.png')
             click(1270.5, 362.0)
-            # time.sleep(10)
+            if i%20==0:
+                print('휴식타임')
+                time.sleep(3)
 
 
 def send_to_all_users():
     with open("user_list.txt", "r", encoding='UTF-8') as f:
         text = f.read()
         for user in text.split('\n'):
-            search_user(user)
-            send_msg()
-
-
+            if datetime.datetime.now().hour < 19: 
+                search_user(user)
+                send_msg()
 
 
 def set_import_msg():
@@ -83,9 +86,9 @@ def initialize():
     return msg
 
 
-def main():
+def main(last_num=None):
     msg = initialize()
-    add_all_users()
+    add_all_users(last_num)
     # send_to_all_users()
     # search_user()
     # send_msg(msg)
@@ -97,4 +100,7 @@ MEDIA_PATH = os.path.dirname(os.path.realpath(__file__)) + '/static/'
 # pyautogui.PAUSE = 0.1
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) == 1:
+        main()
+    elif len(sys.argv) == 2:
+        main(sys.argv[1])
