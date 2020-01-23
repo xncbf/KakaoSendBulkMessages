@@ -7,63 +7,56 @@ import random
 
 
 def send_msg(msg):
-    for i in range(1):
-        time.sleep(1)
-        pyautogui.keyDown('enter')
-        pyperclip.copy(msg)
-        pyautogui.hotkey('command', 'v')
-        pyautogui.keyDown('enter')
-        pyautogui.keyDown('esc')
-        pyautogui.keyDown('down')
-
-
-def add_user():
-    time.sleep(1)
-    pyautogui.hotkey('command', '1')
-    time.sleep(1)
-    # X 버튼이 존재한다면 클릭하여 내용 삭제
-    click_image(f'{MEDIA_PATH}add_user.png')
-    pyperclip.copy('010')
-    pyautogui.hotkey('command', 'v')
-    pyautogui.keyDown('tab')
-    pyautogui.hotkey('command', 'v')
-    click_image(f'{MEDIA_PATH}add_user_submit_button.png')
-    # pyautogui.keyDown('esc')
-    
-    # for i in range(1):
-    #     pyautogui.keyDown('down')
-    time.sleep(2)
-
-
-def search_user():
-    time.sleep(1)
-    pyautogui.hotkey('command', '1')
-    time.sleep(1)
-    # X 버튼이 존재한다면 클릭하여 내용 삭제
-    click_image(f'{MEDIA_PATH}search_icon.png', 30)
-    pyperclip.copy('도희')
+    pyperclip.copy(msg)
     pyautogui.hotkey('command', 'v')
     pyautogui.keyDown('enter')
-    pyautogui.keyDown('down')
-    pyautogui.keyDown('enter')
-    # pyautogui.keyDown('esc')
-    
-    # for i in range(1):
-    #     pyautogui.keyDown('down')
-    time.sleep(2)
+    pyautogui.keyDown('esc')
 
 
 def click_image(path, offset=0):
     location = pyautogui.locateCenterOnScreen(path)
     if location:
         x, y = location
-        pyautogui.moveTo(x/2 + offset,y/2, 0.5)
-        time.sleep(1)
+        pyautogui.moveTo(x/2 + offset,y/2)
         pyautogui.mouseDown()
         pyautogui.mouseUp()
         # pyautogui.mouseUp()
     else:
         return False
+
+def search_user(user):
+    pyautogui.hotkey('command', '1')
+    click_image(f'{MEDIA_PATH}search_icon.png', 30)
+    pyperclip.copy(user)
+    pyautogui.hotkey('command', 'v')
+    pyautogui.keyDown('enter')
+    pyautogui.keyDown('down')
+    pyautogui.keyDown('enter')
+    time.sleep(1)
+
+
+def add_all_users():
+    with open("user_list.txt", "r", encoding='UTF-8') as f:
+        text = f.read()
+        for user in text.split('\n'):
+            print(user)
+            pyautogui.hotkey('command', '2')
+            pyautogui.hotkey('command', '1')
+            click_image(f'{MEDIA_PATH}add_user.png')
+            pyperclip.copy(user)
+            pyautogui.hotkey('command', 'v')
+            pyautogui.keyDown('tab')
+            pyautogui.hotkey('command', 'v')
+            click_image(f'{MEDIA_PATH}add_user_submit_button.png')
+
+
+def send_to_all_users():
+    with open("user_list.txt", "r", encoding='UTF-8') as f:
+        text = f.read()
+        for user in text.split('\n'):
+            search_user(user)
+            send_msg()
+
 
 
 
@@ -83,15 +76,16 @@ def initialize():
 
 def main():
     msg = initialize()
-    search_user()
-    # add_user()
+    add_all_users()
+    send_to_all_users()
+    # search_user()
     # send_msg(msg)
     return
 
 
 # config
 MEDIA_PATH = os.path.dirname(os.path.realpath(__file__)) + '/static/'
-pyautogui.PAUSE = 0.5
+pyautogui.PAUSE = 0.1
 
 if __name__ == "__main__":
     main()
